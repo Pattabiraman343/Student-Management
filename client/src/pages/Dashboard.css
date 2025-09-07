@@ -1,0 +1,160 @@
+/* ===== Dashboard Container ===== */
+.dashboard-container {
+    padding: 2rem 1.5rem;
+    font-family: 'Inter', sans-serif;
+    background: #f9fafb;
+    min-height: 100vh;
+    color: #1f2937;
+  }
+  
+  /* ===== Title ===== */
+  .dashboard-title {
+    font-size: clamp(1.8rem, 5vw, 2.4rem);
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #111827;
+  }
+  
+  /* ===== Cards Grid ===== */
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .card {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+  }
+  
+  .card h3 {
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+  
+  .card p {
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(90deg, #6366f1, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* ===== Charts Section ===== */
+  .charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .chart-box {
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .chart-box h4 {
+    font-size: clamp(1rem, 4vw, 1.25rem);
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #111827;
+  }
+  
+  /* Chart container fix */
+  .chart-box .recharts-responsive-container {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 250px;
+    aspect-ratio: 1.5 / 1;
+  }
+  
+  /* ===== Legend Text ===== */
+  .recharts-legend-item text {
+    font-size: 14px;
+    font-weight: 500;
+    fill: #374151;
+  }
+  
+  /* ===== Error / Loading ===== */
+  .access-denied,
+  .loading,
+  .error-text {
+    color: #ef4444;
+    text-align: center;
+    margin-top: 4rem;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  
+  /* ===== Mobile Tweaks ===== */
+  @media (max-width: 480px) {
+    .dashboard-container {
+      padding: 1.5rem 1rem;
+    }
+  
+    .dashboard-title {
+      font-size: 1.6rem;
+    }
+  
+    .card {
+      padding: 1rem;
+    }
+  
+    .card h3 {
+      font-size: 0.85rem;
+    }
+  
+    .card p {
+      font-size: 1.8rem;
+    }
+  
+    .chart-box {
+      padding: 1rem;
+      min-height: 260px;
+    }
+  
+    .chart-box h4 {
+      font-size: 1rem;
+    }
+  
+    .recharts-legend-item text {
+      font-size: 13px;
+    }
+  }
+  
+  @media (max-width: 320px) {
+    .dashboard-title {
+      font-size: 1.4rem;
+    }
+  
+    .card p {
+      font-size: 1.6rem;
+    }
+  
+    .chart-box {
+      min-height: 240px;
+    }
+  
+    .chart-box h4 {
+      font-size: 0.95rem;
+    }
+  }
+  

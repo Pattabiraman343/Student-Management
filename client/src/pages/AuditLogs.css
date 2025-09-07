@@ -1,0 +1,94 @@
+/* AuditLogs.css */
+
+.audit-container {
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    max-width: 100%;
+    overflow-x: auto; /* ✅ scroll if too wide */
+  }
+  
+  .audit-container h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+    text-align: center;
+  }
+  
+  .audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  
+  .audit-table thead {
+    background: linear-gradient(90deg, #4f46e5, #6366f1);
+    color: #fff;
+  }
+  
+  .audit-table th,
+  .audit-table td {
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .audit-table tbody tr:hover {
+    background: #f9fafb;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .audit-table th {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  
+  .audit-table td {
+    vertical-align: top;
+    color: #444;
+  }
+  
+  .audit-table details summary {
+    cursor: pointer;
+    color: #4f46e5;
+    font-weight: 500;
+  }
+  
+  .audit-table pre {
+    background: #f4f4f4;
+    padding: 0.8rem;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto; /* ✅ scroll inside */
+    font-size: 0.85rem;
+    margin: 0.5rem 0 0;
+  }
+  
+  .access-denied {
+    color: #ef4444;
+    font-weight: 600;
+    text-align: center;
+    padding: 2rem;
+    background: #fee2e2;
+    border-radius: 12px;
+  }
+  
+  /* ✅ Responsive */
+  @media (max-width: 768px) {
+    .audit-table th,
+    .audit-table td {
+      padding: 0.6rem;
+      font-size: 0.85rem;
+    }
+  
+    .audit-container {
+      padding: 1rem;
+    }
+  
+    .audit-container h2 {
+      font-size: 1.4rem;
+    }
+  }
+  
