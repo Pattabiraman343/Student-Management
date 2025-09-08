@@ -116,14 +116,17 @@ export const updateStudent = async (req, res) => {
 
 // ✅ Delete student
 export const deleteStudent = async (req, res) => {
+  const t = await sequelize.transaction(); // start transaction
   try {
-    const student = await Student.findByPk(req.params.id);
-    if (!student) return res.status(404).json({ msg: "Student not found" });
+    const student = await Student.findByPk(req.params.id, { transaction: t });
+    if (!student) {
+      await t.rollback();
+      return res.status(404).json({ msg: "Student not found" });
+    }
 
     if (student.image) safeUnlink(path.join("uploads", student.image));
 
-    await student.destroy();
-
+    // 1️⃣ Create AuditLog first
     await AuditLog.create({
       userId: req.user.id,
       userName: req.user.name,
@@ -131,14 +134,19 @@ export const deleteStudent = async (req, res) => {
       studentId: student.id,
       action: "DELETE",
       changes: { before: student.toJSON() },
-    });
+    }, { transaction: t });
 
+    // 2️⃣ Delete student
+    await student.destroy({ transaction: t });
+
+    await t.commit(); // commit transaction
     res.json({ msg: "Student deleted successfully" });
   } catch (err) {
+    await t.rollback();
+    console.error(err);
     res.status(500).json({ err: err.message });
   }
 };
-
 // ✅ Export students to Excel
 export const exportStudents = async (req, res) => {
     try {
