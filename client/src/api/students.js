@@ -1,19 +1,19 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/students";
-const API_URP = "http://localhost:5000/api";  // backend base URL
+// Hardcoded Render backend URLs
+const API_URL = "https://student-management-lc6d.onrender.com/api/students";
+const API_BASE = "https://student-management-lc6d.onrender.com/api";
 
-// Get token from localStorage
+// Get auth headers
 const getAuthHeaders = (isFormData = false) => {
   const token = localStorage.getItem("token");
   return {
     Authorization: `Bearer ${token}`,
-    ...(isFormData ? {} : { "Content-Type": "application/json" }), 
-    // If sending FormData, let browser handle Content-Type
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
   };
 };
 
-// ✅ Create Student (with image)
+// ✅ Create Student (supports FormData)
 export const createStudent = async (studentData) => {
   try {
     const isFormData = studentData instanceof FormData;
@@ -26,43 +26,24 @@ export const createStudent = async (studentData) => {
     throw err;
   }
 };
-export const getAuditLogs = async () => {
-    const res = await axios.get(`${API_URP}/audit-logs`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`, // if using auth
-      },
-    });
-    return res.data;
-  };
+
+// ✅ Get all students
 export const getStudents = async ({ page = 1, limit = 10, search = "", gradeFilter = "", sectionFilter = "" }) => {
+  try {
     const params = { page, limit };
     if (search) params.search = search;
     if (gradeFilter) params.gradeFilter = gradeFilter;
     if (sectionFilter) params.sectionFilter = sectionFilter;
-  
-    const res = await axios.get(API_URL, {
-      headers: getAuthHeaders(),
-      params,
-    });
-  
-    return res.data; // should contain { students: [], totalPages, total }
-  };
-  
-// api/students.js
-export const getAllSections = async () => {
-  const res = await axios.get("http://localhost:5000/api/students/classes", {
-    headers: getAuthHeaders(),
-  });
-  return res.data.sections || [];
-};
-export const getAllGrades = async () => {
-  const res = await axios.get("http://localhost:5000/api/students/classes", {
-    headers: getAuthHeaders(),
-  });
-  return res.data.grades || []; // return grades array
+
+    const res = await axios.get(API_URL, { headers: getAuthHeaders(), params });
+    return res.data; // { students: [], totalPages, total }
+  } catch (err) {
+    console.error("Error fetching students:", err.response?.data || err.message);
+    throw err;
+  }
 };
 
-// ✅ Get Student by ID
+// ✅ Get student by ID
 export const getStudentById = async (id) => {
   try {
     const res = await axios.get(`${API_URL}/${id}`, { headers: getAuthHeaders() });
@@ -73,13 +54,11 @@ export const getStudentById = async (id) => {
   }
 };
 
-// ✅ Update Student (works with FormData or JSON)
+// ✅ Update Student
 export const updateStudent = async (id, studentData) => {
   try {
     const isFormData = studentData instanceof FormData;
-    const res = await axios.put(`${API_URL}/${id}`, studentData, {
-      headers: getAuthHeaders(isFormData),
-    });
+    const res = await axios.put(`${API_URL}/${id}`, studentData, { headers: getAuthHeaders(isFormData) });
     return res.data;
   } catch (err) {
     console.error("Error updating student:", err.response?.data || err.message);
@@ -97,54 +76,77 @@ export const deleteStudent = async (id) => {
     throw err;
   }
 };
-export const getAllClasses = async (token) => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/students/classes", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      return res.data.classes || [];
-    } catch (err) {
-      console.error("Error fetching classes:", err.response?.data || err.message);
-      return [];
-    }
-  };
-  
-  export const exportStudents = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/export`, {
-        headers: getAuthHeaders(),
-        responseType: "blob",
-      });
-  
-      // Trigger file download
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "students.xlsx");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (err) {
-      console.error("Error exporting:", err.response?.data || err.message);
-      throw err;
-    }
-  };
-  
-  export const importStudents = async (file) => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-  
-      const res = await axios.post(`${API_URL}/import`, formData, {
-        headers: getAuthHeaders(true),
-      });
-  
-      return res.data; // ✅ Will contain inserted, skipped, errors
-    } catch (err) {
-      console.error("Error importing:", err.response?.data || err.message);
-      throw err;
-    }
-  };
+
+// ✅ Get all grades
+export const getAllGrades = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/students/classes`, { headers: getAuthHeaders() });
+    return res.data.grades || [];
+  } catch (err) {
+    console.error("Error fetching grades:", err.response?.data || err.message);
+    return [];
+  }
+};
+
+// ✅ Get all sections
+export const getAllSections = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/students/classes`, { headers: getAuthHeaders() });
+    return res.data.sections || [];
+  } catch (err) {
+    console.error("Error fetching sections:", err.response?.data || err.message);
+    return [];
+  }
+};
+
+// ✅ Get all classes
+export const getAllClasses = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/students/classes`, { headers: getAuthHeaders() });
+    return res.data.classes || [];
+  } catch (err) {
+    console.error("Error fetching classes:", err.response?.data || err.message);
+    return [];
+  }
+};
+
+// ✅ Export students as Excel
+export const exportStudents = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/export`, { headers: getAuthHeaders(), responseType: "blob" });
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "students.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } catch (err) {
+    console.error("Error exporting students:", err.response?.data || err.message);
+    throw err;
+  }
+};
+
+// ✅ Import students from Excel
+export const importStudents = async (file) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await axios.post(`${API_URL}/import`, formData, { headers: getAuthHeaders(true) });
+    return res.data; // { inserted, skipped, errors }
+  } catch (err) {
+    console.error("Error importing students:", err.response?.data || err.message);
+    throw err;
+  }
+};
+
+// ✅ Get audit logs
+export const getAuditLogs = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/audit-logs`, { headers: getAuthHeaders() });
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching audit logs:", err.response?.data || err.message);
+    throw err;
+  }
+};

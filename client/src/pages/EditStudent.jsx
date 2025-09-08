@@ -2,7 +2,30 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
-import { getStudentById, updateStudent } from "../api/students";
+import axios from "axios";
+
+const RENDER_BASE_URL = "https://student-management-lc6d.onrender.com/api";
+
+// Helper to get auth headers
+const getAuthHeaders = (isFormData = false) => {
+  const token = localStorage.getItem("token");
+  return {
+    Authorization: `Bearer ${token}`,
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
+  };
+};
+
+// Fetch student by ID from Render
+const fetchStudentById = async (id) => {
+  const res = await axios.get(`${RENDER_BASE_URL}/students/${id}`, { headers: getAuthHeaders() });
+  return res.data;
+};
+
+// Update student on Render
+const updateStudentById = async (id, formData) => {
+  const res = await axios.put(`${RENDER_BASE_URL}/students/${id}`, formData, { headers: getAuthHeaders(true) });
+  return res.data;
+};
 
 const EditStudent = () => {
   const { id } = useParams();
@@ -11,19 +34,19 @@ const EditStudent = () => {
   const { register, handleSubmit, setValue } = useForm();
 
   useEffect(() => {
-    getStudentById(id).then((data) => {
+    fetchStudentById(id).then((data) => {
       setValue("name", data.name);
       setValue("age", data.age);
       setValue("className", data.class);
       setValue("grade", data.grade);
       setValue("section", data.section);
       setValue("gender", data.gender);
-      if (data.image) setPreview(`http://localhost:5000/uploads/${data.image}`);
+      if (data.image) setPreview(`${RENDER_BASE_URL.replace("/api", "")}/uploads/${data.image}`);
     });
   }, [id, setValue]);
 
   const mutation = useMutation({
-    mutationFn: (formData) => updateStudent(id, formData),
+    mutationFn: (formData) => updateStudentById(id, formData),
     onSuccess: () => navigate("/students"),
   });
 
@@ -54,7 +77,14 @@ const EditStudent = () => {
           <option value="Male">Male</option>
           <option value="Female">Female</option>
         </select>
-        <input type="file" accept="image/*" {...register("image")} onChange={(e) => { if (e.target.files[0]) setPreview(URL.createObjectURL(e.target.files[0])); }} />
+        <input
+          type="file"
+          accept="image/*"
+          {...register("image")}
+          onChange={(e) => {
+            if (e.target.files[0]) setPreview(URL.createObjectURL(e.target.files[0]));
+          }}
+        />
         {preview && <img src={preview} alt="Preview" className="mt-2 w-24 h-24 rounded-md object-cover" />}
         <button type="submit">{mutation.isLoading ? "Updating..." : "Update Student"}</button>
       </form>

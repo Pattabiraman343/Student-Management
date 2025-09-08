@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, Link } from "react-router-dom";
@@ -14,6 +14,7 @@ const Register = () => {
   } = useForm();
 
   const navigate = useNavigate();
+  const [showSpinner, setShowSpinner] = useState(false);
 
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -21,8 +22,12 @@ const Register = () => {
       return res.data;
     },
     onSuccess: () => {
-      reset();
-      navigate("/login");
+      // Show spinner overlay for 2 seconds before navigating
+      setShowSpinner(true);
+      setTimeout(() => {
+        reset();
+        navigate("/login");
+      }, 2000);
     },
   });
 
@@ -32,6 +37,13 @@ const Register = () => {
 
   return (
     <div className="auth-container">
+      {(mutation.isLoading || showSpinner) && (
+        <div className="spinner-overlay">
+          <div className="spinner"></div>
+          <p className="spinner-text">Registering...</p>
+        </div>
+      )}
+
       <div className="auth-card">
         <h2 className="auth-title">Register</h2>
 
@@ -61,20 +73,20 @@ const Register = () => {
 
           <div className="form-group">
             <label>Role</label>
-            <select
-              {...register("role", { required: "Role is required" })}
-            >
+            <select {...register("role", { required: "Role is required" })}>
               <option value="">-- Select Role --</option>
               <option value="Admin">Admin</option>
               <option value="Teacher">Teacher</option>
             </select>
-            {errors.role && (
-              <p className="error-text">{errors.role.message}</p>
-            )}
+            {errors.role && <p className="error-text">{errors.role.message}</p>}
           </div>
 
-          <button type="submit" disabled={mutation.isLoading} className="btn">
-            {mutation.isLoading ? "Registering..." : "Register"}
+          <button
+            type="submit"
+            disabled={mutation.isLoading || showSpinner}
+            className="btn"
+          >
+            Register
           </button>
         </form>
 

@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/auth";
+const API_URL = "https://student-management-lc6d.onrender.com/api/auth";
+
+
 
 // ✅ Register User
 export const registerUser = async (userData) => {
@@ -22,7 +24,6 @@ export const loginUser = async (credentials) => {
       headers: { "Content-Type": "application/json" },
     });
 
-    // store token in localStorage
     if (res.data.token) {
       localStorage.setItem("token", res.data.token);
     }

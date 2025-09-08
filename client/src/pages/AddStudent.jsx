@@ -9,6 +9,7 @@ import "./AddStudent.css";
 const AddStudent = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
   const [preview, setPreview] = useState(null);
+  const [showSpinner, setShowSpinner] = useState(false); // Spinner state
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useSelector((state) => state.auth);
@@ -16,10 +17,14 @@ const AddStudent = () => {
   const mutation = useMutation({
     mutationFn: createStudent,
     onSuccess: () => {
-      reset();
-      setPreview(null);
-      queryClient.invalidateQueries(["students"]);
-      navigate("/students");
+      // Show spinner for 2 seconds before navigating
+      setShowSpinner(true);
+      setTimeout(() => {
+        reset();
+        setPreview(null);
+        queryClient.invalidateQueries(["students"]);
+        navigate("/students");
+      }, 2000);
     },
   });
 
@@ -31,16 +36,23 @@ const AddStudent = () => {
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("age", data.age);
-    formData.append("class", data.className);
+    formData.append("class", data.className || "");
     formData.append("grade", data.grade);
     formData.append("section", data.section);
     formData.append("gender", data.gender);
-    if (data.image[0]) formData.append("image", data.image[0]);
+    if (data.image && data.image[0]) formData.append("image", data.image[0]);
     mutation.mutate(formData);
   };
 
   return (
     <div className="add-student-container">
+      {(mutation.isLoading || showSpinner) && (
+        <div className="spinner-overlay">
+          <div className="spinner"></div>
+          <p className="spinner-text">Saving Student...</p>
+        </div>
+      )}
+
       <h2 className="form-title">Add Student</h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="student-form">
@@ -68,9 +80,6 @@ const AddStudent = () => {
           {errors.section && <p className="error-text">{errors.section.message}</p>}
         </div>
 
-
-
-
         <div className="form-group">
           <label>Gender</label>
           <select {...register("gender", { required: "Gender is required" })}>
@@ -83,14 +92,23 @@ const AddStudent = () => {
 
         <div className="form-group">
           <label>Profile Photo</label>
-          <input type="file" accept="image/*" {...register("image")} onChange={(e) => { if (e.target.files[0]) setPreview(URL.createObjectURL(e.target.files[0])); }} />
+          <input
+            type="file"
+            accept="image/*"
+            {...register("image")}
+            onChange={(e) => { if (e.target.files[0]) setPreview(URL.createObjectURL(e.target.files[0])); }}
+          />
           {preview && <img src={preview} alt="Preview" className="preview-img" />}
         </div>
 
         <div className="form-actions">
           <Link to="/students" className="back-btn">← Back</Link>
-          <button type="submit" disabled={mutation.isLoading} className="submit-btn">
-            {mutation.isLoading ? "Saving..." : "Save Student"}
+          <button
+            type="submit"
+            disabled={mutation.isLoading || showSpinner}
+            className="submit-btn"
+          >
+            Save Student
           </button>
         </div>
       </form>

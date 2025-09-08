@@ -55,21 +55,57 @@
     margin-top: 0.2rem;
   }
   
-  .btn {
-    background: #2563eb;
-    color: #fff;
-    padding: 0.7rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background 0.3s;
-  }
-  
-  .btn:hover {
-    background: #1d4ed8;
-  }
-  
+/* existing styles remain unchanged */
+
+.btn {
+  background: #2563eb;
+  color: #fff;
+  padding: 0.7rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:hover {
+  background: #1d4ed8;
+}
+/* Spinner style */
+/* Existing styles remain unchanged... */
+
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(4px); /* background blur */
+  background-color: rgba(0, 0, 0, 0.2); /* semi-transparent */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #fff;
+  border-top: 6px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
   .auth-footer {
     text-align: center;
     margin-top: 1rem;

@@ -1,12 +1,13 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+// Hardcoded Render backend URL
+const API_URL = "https://student-management-lc6d.onrender.com/api";
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
 });
 
-// Attach token (read from localStorage)
+// Attach token automatically
 axiosInstance.interceptors.request.use(config => {
   const token = localStorage.getItem("token");
   if (token) config.headers.Authorization = `Bearer ${token}`;

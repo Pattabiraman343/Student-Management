@@ -24,6 +24,8 @@ const StudentsList = () => {
   const [preview, setPreview] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
+  const RENDER_BASE_URL = "https://student-management-lc6d.onrender.com";
+  const [spinnerText, setSpinnerText] = useState(""); // For dynamic spinner text
 
   // Fetch students
   const { data, isLoading, isError } = useQuery({
@@ -44,24 +46,29 @@ const StudentsList = () => {
     queryFn: getAllGrades,
   });
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: deleteStudent,
+    onMutate: () => setSpinnerText("Deleting student..."),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["students"] });
       setShowDeleteModal(false);
       setStudentToDelete(null);
+      setSpinnerText(""); // hide spinner
     },
+    onError: () => setSpinnerText(""), // hide spinner on error
   });
 
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, formData }) => updateStudent(id, formData),
+    onMutate: () => setSpinnerText("Updating student..."),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["students"] });
       setEditingStudent(null);
       setPreview(null);
+      setSpinnerText(""); // hide spinner
     },
+    onError: () => setSpinnerText(""),
   });
 
   const students = data?.students || [];
@@ -69,7 +76,9 @@ const StudentsList = () => {
 
   const handleEditClick = (student) => {
     setEditingStudent(student);
-    setPreview(student.image ? `http://localhost:5000/uploads/${student.image}` : null);
+    setPreview(
+      student.image ? `${RENDER_BASE_URL}/uploads/${student.image}` : null
+    );
   };
 
   const handleDeleteClick = (student) => {
@@ -94,6 +103,12 @@ const StudentsList = () => {
 
   return (
     <div className="students-container">
+            {(deleteMutation.isLoading || updateMutation.isLoading) && spinnerText && (
+        <div className="spinner-overlay">
+          <div className="spinner"></div>
+          <p className="spinner-text">{spinnerText}</p>
+        </div>
+      )}
       <h2 className="students-title">Students List</h2>
 
       {/* Filters */}
@@ -120,7 +135,7 @@ const StudentsList = () => {
         setPage(1);
       }}
     >
-      <option value="">All Grades</option>
+      <option value="">All Classes</option>
       {gradesData.map((g) => (
         <option key={g} value={g}>
           {g}
@@ -229,15 +244,16 @@ const StudentsList = () => {
               {students.map((s) => (
                 <tr key={s.id}>
                   <td>
-                    {s.image ? (
-                      <img
-                        src={`http://localhost:5000/uploads/${s.image}`}
-                        alt={s.name}
-                        className="student-photo"
-                      />
-                    ) : (
-                      "—"
-                    )}
+                  { s.image ? (
+    <img
+      src={`${RENDER_BASE_URL}/uploads/${s.image}`}
+      alt={s.name}
+      className="student-photo"
+    />
+  ) : (
+    "—"
+  )
+}
                   </td>
                   <td>{s.name}</td>
                   <td>{s.age}</td>
@@ -309,7 +325,6 @@ const StudentsList = () => {
                 }
               />
 
-              {/* Grade dropdown */}
               <select
                 value={editingStudent.grade}
                 onChange={(e) =>
@@ -324,7 +339,6 @@ const StudentsList = () => {
                 ))}
               </select>
 
-              {/* Section dropdown */}
               <select
                 value={editingStudent.section}
                 onChange={(e) =>
