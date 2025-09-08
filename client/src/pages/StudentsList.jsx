@@ -11,6 +11,8 @@ import {
   getAllGrades,
 } from "../api/students";
 import "./StudentsList.css";
+import heroImage2 from "../assets/blank-profile-picture-973460_1280.webp"; // Add your hero image here
+
 
 const StudentsList = () => {
   const { user } = useSelector((state) => state.auth);
@@ -243,18 +245,22 @@ const StudentsList = () => {
             <tbody>
               {students.map((s) => (
                 <tr key={s.id}>
-                  <td>
-                  { s.image ? (
+           <td>
+  {s.image ? (
     <img
       src={`${RENDER_BASE_URL}/uploads/${s.image}`}
       alt={s.name}
       className="student-photo"
     />
   ) : (
-    "—"
-  )
-}
-                  </td>
+    <img
+      src={heroImage2}// <-- path to your default image
+      alt="Default"
+      className="student-photo default-photo"
+    />
+  )}
+</td>
+
                   <td>{s.name}</td>
                   <td>{s.age}</td>
                   <td>{s.grade}</td>
