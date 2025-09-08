@@ -5,6 +5,7 @@ import { Op, Sequelize } from "sequelize";
 import ExcelJS from "exceljs";
 import xlsx from "xlsx";
 import path from "path";
+import sequelize from "../config/db.js"; // make sure your Sequelize instance is imported
 
 // Utility: Safe delete for images
 const safeUnlink = (filePath) => {
