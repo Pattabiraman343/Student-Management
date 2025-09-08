@@ -236,7 +236,7 @@ const StudentsList = () => {
                 <th>Photo</th>
                 <th>Name</th>
                 <th>Age</th>
-                <th>Grade</th>
+                <th>Class</th>
                 <th>Section</th>
                 <th>Gender</th>
                 {user?.role === "Admin" && <th>Actions</th>}
