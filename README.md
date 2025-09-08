@@ -1,110 +1,129 @@
-# 📚 Student Management System
 
-A simple **MERN + PostgreSQL** project for managing students, built as an interview task.  
-The project includes **backend (Node.js + Express + Sequelize + PostgreSQL)** and **frontend (React)**.
+📚 Student Management System
 
----
+A full-stack Student Management System built with React, Node.js, and PostgreSQL.
+✅ Features user authentication, role-based access, CRUD operations for students, Excel import/export, dashboard analytics, and audit logs.
+🔗 Live Demo: https://student-management-nine-rho.vercel.app/
 
-## 🚀 Features
-- Add / Edit / Delete / View students
-- Import students via Excel file
-- Export students to Excel
-- Track actions with audit logs
-- Responsive React frontend
+Admin credentials
 
----
+Username  :  Admin
+Password  :  admin@123
 
-## ⚙️ Tech Stack
-**Backend:**
-- Node.js
-- Express
-- Sequelize ORM
-- PostgreSQL
 
-**Frontend:**
-- React
-- Axios
-- TailwindCSS (or plain CSS, depending on your setup)
+Teacher credentials
 
----
+Username  :  Geetha
+Password  :  geetha@123
 
-## 📂 Project Structure
+
+🚀 Features
+Core
+
+User Registration & Login (JWT Auth)
+
+Add / Edit / Delete / View students
+
+Upload student profile photos
+
+Search & filter by name, grade, section
+
+Pagination for student list
+
+Smart
+
+Role-Based Access: Admin (full access), Teacher (view only)
+
+Excel Import & Export with validation
+
+Dashboard: total students, students per class, gender ratio (charts)
+
+Audit logs for all actions
+
+🛠️ Tech Stack
+
+Frontend: React, Redux, React Query, TailwindCSS / CSS
+Backend: Node.js, Express, Sequelize ORM, PostgreSQL
+Authentication: JWT
+Charts: Recharts
+Excel: XLSX
+
+📂 Project Structure
 student-management-system/
-│── server/ # Backend (Node.js + Express)
-│ ├── config/ # Database config (db.js)
-│ ├── controllers/ # Business logic
-│ ├── models/ # Sequelize models
-│ ├── routes/ # Express routes
-│ └── index.js # Entry point
+│── server/         # Backend
+│   ├── config/     # DB config
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   └── index.js    # Entry point
 │
-│── client/ # Frontend (React)
-│ ├── src/
-│ ├── package.json
-│ └── ...
+│── client/         # Frontend
+│   ├── src/
+│   └── package.json
 │
 └── README.md
 
-yaml
-Copy code
-
----
-
-## 🛠️ Setup & Installation
-
-### 1️⃣ Clone the repo
-```bash
+⚙️ Setup Instructions
+1️⃣ Clone the repo
 git clone https://github.com/your-username/student-management-system.git
 cd student-management-system
-2️⃣ Setup Backend
-bash
-Copy code
+
+2️⃣ Backend Setup
 cd server
 npm install
-Make sure PostgreSQL is running locally.
 
-Create a database named student_management in PostgreSQL.
 
-Default DB credentials are already in server/config/db.js:
+Update PostgreSQL credentials in server/config/db.js or .env:
 
-yaml
-Copy code
-DB Name: student_management
-User: postgres
-Password: pattabi
-Host: localhost
-Dialect: postgres
+DB_NAME=student_management
+DB_USER=postgres
+DB_PASSWORD=your_password
+DB_HOST=localhost
+DB_PORT=5432
+
+
 Start the backend:
 
-bash
-Copy code
-npm start
-Backend runs on http://localhost:5000
+node index.js
 
-3️⃣ Setup Frontend
-bash
-Copy code
+
+Backend runs at: http://localhost:5000
+
+3️⃣ Frontend Setup
 cd ../client
 npm install
 npm start
-Frontend runs on http://localhost:3000
 
-📊 Import & Export
-Upload Excel (.xlsx) file to import students
 
-Export student list to Excel with one click
+Frontend runs at: http://localhost:3000
 
 📝 Notes
-Credentials are hardcoded in db.js (no .env setup needed) for easy review.
 
-For real-world projects, always use .env for sensitive values.
+Admin role can manage students; Teacher role can only view.
 
-✅ Ready to Run
+
+Admin credentials
+
+Username  :  Admin
+Password  :  admin@123
+
+
+Teacher credentials
+
+Username  :  Geetha
+Password  :  geetha@123
+
+
+Excel import/export available on the Students page.
+
+Audit logs track all add/edit/delete actions.
+
+✅ Ready to Use:
+
 Start PostgreSQL
 
-Run backend (server/) → npm start
+Run backend → node index.js
 
-Run frontend (client/) → npm start
+Run frontend → npm start
 
 Open browser → http://localhost:3000
-
-🎉 Done! You have a working Student Management System.
