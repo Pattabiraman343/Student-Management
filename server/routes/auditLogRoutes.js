@@ -5,7 +5,6 @@ import role from "../middlewares/role.js";
 
 const router = express.Router();
 
-// Only Admins can view logs
 router.get("/", auth, role("Admin"), getAuditLogs);
 
 export default router;

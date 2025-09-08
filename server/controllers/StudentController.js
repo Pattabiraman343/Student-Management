@@ -7,7 +7,6 @@ import xlsx from "xlsx";
 import path from "path";
 import sequelize from "../config/db.js";
 
-// Utility: Safe delete for images
 const safeUnlink = (filePath) => {
   try {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -16,7 +15,7 @@ const safeUnlink = (filePath) => {
   }
 };
 
-// ✅ Add student
+//  Add student
 export const addStudent = async (req, res) => {
   try {
     const { name, age, grade, section, gender } = req.body;
@@ -39,7 +38,7 @@ export const addStudent = async (req, res) => {
   }
 };
 
-// ✅ Get students (pagination + search + filter)
+//  Get students (pagination + search + filter)
 export const getStudents = async (req, res) => {
   try {
     const { page = 1, limit = 10, search = "", gradeFilter = "", sectionFilter = "" } = req.query;
@@ -73,7 +72,7 @@ export const getStudents = async (req, res) => {
   }
 };
 
-// ✅ Update student
+//  Update student
 export const updateStudent = async (req, res) => {
   try {
     const student = await Student.findByPk(req.params.id);
@@ -113,7 +112,7 @@ export const updateStudent = async (req, res) => {
   }
 };
 
-// ✅ Delete student
+//  Delete student
 export const deleteStudent = async (req, res) => {
   const t = await sequelize.transaction();
   try {
@@ -148,7 +147,7 @@ export const deleteStudent = async (req, res) => {
   }
 };
 
-// ✅ Export students to Excel
+//  Export students to Excel
 export const exportStudents = async (req, res) => {
   try {
     const students = await Student.findAll({ order: [["id", "ASC"]] });
@@ -191,7 +190,7 @@ export const exportStudents = async (req, res) => {
   }
 };
 
-// ✅ Import students from Excel
+//  Import students from Excel
 export const importStudents = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
@@ -244,7 +243,7 @@ export const importStudents = async (req, res) => {
   }
 };
 
-// ✅ Get grades + sections
+//  Get grades + sections
 export const getAllGradesSections = async (req, res) => {
   try {
     const gradesRaw = await Student.findAll({
@@ -268,7 +267,7 @@ export const getAllGradesSections = async (req, res) => {
   }
 };
 
-// ✅ Dashboard stats
+//  Dashboard stats
 export const getDashboardStats = async (req, res) => {
   try {
     const total = await Student.count();

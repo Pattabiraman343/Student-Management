@@ -2,7 +2,6 @@ import AuditLog from "../models/AuditLogs.js";
 import Student from "../models/Student.js";
 import User from "../models/User.js";
 
-// Get all audit logs (Admins only)
 export const getAuditLogs = async (req, res) => {
     try {
       const logs = await AuditLog.findAll({

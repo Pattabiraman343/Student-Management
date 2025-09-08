@@ -16,7 +16,6 @@ import {
 
 const router = express.Router();
 
-// ✅ Multer config for images (unique name + extension)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => {
@@ -27,10 +26,9 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// ✅ Multer config for Excel uploads
+// Multer config for Excel uploads
 const uploadExcel = multer({ dest: "uploads/" });
 
-// -------- Routes --------
 
 // Admin only
 router.post("/", auth, role(["Admin"]), upload.single("image"), addStudent);

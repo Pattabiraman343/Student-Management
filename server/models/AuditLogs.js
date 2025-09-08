@@ -9,13 +9,13 @@ const AuditLog = sequelize.define("AuditLog", {
   },
   userName: {
     type: DataTypes.STRING,
-    allowNull: true,   // ✅ Sequelize won’t force NOT NULL
+    allowNull: true,   // sequelize won’t force NOT NULL
   }
   
   ,
   userRole: {
     type: DataTypes.STRING,
-    allowNull: true,   // ✅ Sequelize won’t force NOT NULL
+    allowNull: true,   //  Sequelize won’t force NOT NULL
   },
   studentId: {
     type: DataTypes.INTEGER,

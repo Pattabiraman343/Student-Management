@@ -4,8 +4,8 @@ import sequelize from "../config/db.js";
 const Student = sequelize.define("Student", {
     name: { type: DataTypes.STRING, allowNull: false },
     age: { type: DataTypes.INTEGER },
-    grade: { type: DataTypes.STRING, allowNull: true },   // allow null
-    section: { type: DataTypes.STRING, allowNull: true }, // allow null
+    grade: { type: DataTypes.STRING, allowNull: true },   
+    section: { type: DataTypes.STRING, allowNull: true }, 
     gender: {
       type: DataTypes.ENUM('Male','Female','Other'),
       allowNull: false
