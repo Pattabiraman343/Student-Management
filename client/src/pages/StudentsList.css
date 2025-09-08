@@ -427,6 +427,37 @@ button:hover,
   .delete-modal .modal-actions button {
     width: 100%;
   }
+}/* ===== Responsive Fix for Filters ===== */
+@media (max-width: 425px) {
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch; /* full width */
+  }
+
+  .filters {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .filter-wrapper {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .dropdown-wrapper,
+  .filters input {
+    width: 100%; /* take full width */
+    min-width: unset;
+  }
+
+  button,
+  .import-btn,
+  .export-btn,
+  .clear-btn,
+  .add-btn {
+    width: 100%; /* buttons full width on mobile */
+  }
 }
 /* Modern dropdown */
 /* Wrapper spacing */
