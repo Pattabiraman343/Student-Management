@@ -42,7 +42,7 @@ Audit logs for all actions
 
 🛠️ Tech Stack
 
-Frontend: React, Redux, React Query, TailwindCSS / CSS
+Frontend: React, Redux, React Query,  CSS
 Backend: Node.js, Express, Sequelize ORM, PostgreSQL
 Authentication: JWT
 Charts: Recharts
