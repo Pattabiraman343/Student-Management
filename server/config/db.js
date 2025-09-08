@@ -1,14 +1,15 @@
-
-// db.js
 import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
+
+dotenv.config(); // load env variables
 
 const sequelize = new Sequelize(
-  "student_management_cp3y", // Database name
-  "student_management_cp3y_user", // Username
-  "RRFv1BHKxybWdrm7wK5TDfm7qL0WcimN", // 🔑 Replace with your Render DB password
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    host: "dpg-d2v4ckp5pdvs73b1na5g-a.singapore-postgres.render.com", // External hostname
-    port: 5432,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     dialect: "postgres",
     logging: false,
     dialectOptions: {
