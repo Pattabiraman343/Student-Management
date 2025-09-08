@@ -29,7 +29,7 @@ const AddStudent = () => {
   });
 
   if (user?.role !== "Admin") {
-    return <p className="not-allowed">❌ Only Admins can add students.</p>;
+    return <p className="not-allowed"> Only Admins can add students.</p>;
   }
 
   const onSubmit = (data) => {

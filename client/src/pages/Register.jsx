@@ -22,7 +22,6 @@ const Register = () => {
       return res.data;
     },
     onSuccess: () => {
-      // Show spinner overlay for 2 seconds before navigating
       setShowSpinner(true);
       setTimeout(() => {
         reset();

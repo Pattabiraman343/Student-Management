@@ -11,7 +11,7 @@ const AuditLogs = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["auditLogs"],
     queryFn: getAuditLogs,
-    enabled: role === "Admin", // Only Admin can view logs
+    enabled: role === "Admin", 
   });
 
   if (role !== "Admin")
@@ -22,7 +22,7 @@ const AuditLogs = () => {
 
   return (
     <div className="audit-container">
-      <h2>📝 Audit Logs</h2>
+      <h2> Audit Logs</h2>
       <table className="audit-table">
         <thead>
           <tr>

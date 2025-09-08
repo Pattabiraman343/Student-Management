@@ -183,11 +183,11 @@ const StudentsList = () => {
                     try {
                       const result = await importStudents(file);
                       alert(
-                        `✅ ${result.msg} (${result.inserted} imported, ${result.skipped} skipped)`
+                        ` ${result.msg} (${result.inserted} imported, ${result.skipped} skipped)`
                       );
                       queryClient.invalidateQueries({ queryKey: ["students"] });
                     } catch {
-                      alert("❌ Import failed. Check console for details.");
+                      alert(" Import failed. Check console for details.");
                     }
                   }
                 }}

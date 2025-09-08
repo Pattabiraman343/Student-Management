@@ -27,7 +27,6 @@ const Login = () => {
     onSuccess: (data) => {
       dispatch(loginSuccess({ user: { role: data.role }, token: data.token }));
 
-      // Show spinner overlay for 2 seconds
       setShowSpinner(true);
       setTimeout(() => {
         navigate("/dashboard");

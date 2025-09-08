@@ -9,15 +9,14 @@ import Class from "./pages/ClassPage";
 import AuditLogs from "./pages/AuditLogs";
 
 import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./pages/Home"; // ✅ Import new Home page
-
+import Home from "./pages/Home"; 
 function App() {
   return (
     <>
       <Navbar />
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Home />} />   {/* 👈 Default Home Page */}
+        <Route path="/" element={<Home />} />  
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

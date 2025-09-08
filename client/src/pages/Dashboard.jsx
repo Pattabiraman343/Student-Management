@@ -39,7 +39,7 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <h1 className="dashboard-title">📊 Student Dashboard</h1>
+      <h1 className="dashboard-title">Student Dashboard</h1>
 
       {/* Summary Cards */}
       <div className="cards-container">
