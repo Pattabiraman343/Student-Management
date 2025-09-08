@@ -5,14 +5,14 @@ import { Op, Sequelize } from "sequelize";
 import ExcelJS from "exceljs";
 import xlsx from "xlsx";
 import path from "path";
-import sequelize from "../config/db.js"; // make sure your Sequelize instance is imported
+import sequelize from "../config/db.js";
 
 // Utility: Safe delete for images
 const safeUnlink = (filePath) => {
   try {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   } catch (err) {
-    console.warn("Safe unlink failed:", err.message);
+    console.error("Error deleting file:", err);
   }
 };
 
@@ -40,44 +40,39 @@ export const addStudent = async (req, res) => {
 };
 
 // ✅ Get students (pagination + search + filter)
-// Get students (search + filter, optional pagination)
 export const getStudents = async (req, res) => {
-    try {
-      const { page = 1, limit = 10, search = "", gradeFilter = "", sectionFilter = "" } = req.query;
-  
-      const where = {};
-  
-      // Search by name (case-insensitive)
-      if (search) where.name = { [Op.iLike]: `%${search}%` };
-  
-      // Filter grade and section (case-insensitive)
-      if (gradeFilter) where.grade = { [Op.iLike]: gradeFilter.trim() };
-      if (sectionFilter) where.section = { [Op.iLike]: sectionFilter.trim() };
-  
-      // Pagination
-      const _limit = +limit;
-      const _page = +page;
-      const offset = (_page - 1) * _limit;
-  
-      const { count, rows } = await Student.findAndCountAll({
-        where,
-        limit: _limit,
-        offset,
-        order: [["id", "ASC"]],
-      });
-  
-      res.json({
-        total: count,
-        students: rows,
-        page: _page,
-        totalPages: Math.ceil(count / _limit),
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ err: err.message });
-    }
-  };
-  
+  try {
+    const { page = 1, limit = 10, search = "", gradeFilter = "", sectionFilter = "" } = req.query;
+
+    const where = {};
+
+    if (search) where.name = { [Op.iLike]: `%${search}%` };
+    if (gradeFilter) where.grade = { [Op.iLike]: gradeFilter.trim() };
+    if (sectionFilter) where.section = { [Op.iLike]: sectionFilter.trim() };
+
+    const _limit = +limit;
+    const _page = +page;
+    const offset = (_page - 1) * _limit;
+
+    const { count, rows } = await Student.findAndCountAll({
+      where,
+      limit: _limit,
+      offset,
+      order: [["id", "ASC"]],
+    });
+
+    res.json({
+      total: count,
+      students: rows,
+      page: _page,
+      totalPages: Math.ceil(count / _limit),
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err: err.message });
+  }
+};
+
 // ✅ Update student
 export const updateStudent = async (req, res) => {
   try {
@@ -94,7 +89,10 @@ export const updateStudent = async (req, res) => {
     if (gender) student.gender = gender;
 
     if (req.file) {
-      if (student.image) safeUnlink(path.join("uploads", student.image));
+      if (student.image) {
+        const oldPath = path.join("uploads", student.image);
+        safeUnlink(oldPath);
+      }
       student.image = req.file.filename;
     }
 
@@ -117,7 +115,7 @@ export const updateStudent = async (req, res) => {
 
 // ✅ Delete student
 export const deleteStudent = async (req, res) => {
-  const t = await sequelize.transaction(); // start transaction
+  const t = await sequelize.transaction();
   try {
     const student = await Student.findByPk(req.params.id, { transaction: t });
     if (!student) {
@@ -127,20 +125,21 @@ export const deleteStudent = async (req, res) => {
 
     if (student.image) safeUnlink(path.join("uploads", student.image));
 
-    // 1️⃣ Create AuditLog first
-    await AuditLog.create({
-      userId: req.user.id,
-      userName: req.user.name,
-      userRole: req.user.role,
-      studentId: student.id,
-      action: "DELETE",
-      changes: { before: student.toJSON() },
-    }, { transaction: t });
+    await AuditLog.create(
+      {
+        userId: req.user.id,
+        userName: req.user.name,
+        userRole: req.user.role,
+        studentId: student.id,
+        action: "DELETE",
+        changes: { before: student.toJSON() },
+      },
+      { transaction: t }
+    );
 
-    // 2️⃣ Delete student
     await student.destroy({ transaction: t });
 
-    await t.commit(); // commit transaction
+    await t.commit();
     res.json({ msg: "Student deleted successfully" });
   } catch (err) {
     await t.rollback();
@@ -148,120 +147,104 @@ export const deleteStudent = async (req, res) => {
     res.status(500).json({ err: err.message });
   }
 };
+
 // ✅ Export students to Excel
 export const exportStudents = async (req, res) => {
-    try {
-      const students = await Student.findAll({
-        order: [["id", "ASC"]], // optional, sort by DB id
+  try {
+    const students = await Student.findAll({ order: [["id", "ASC"]] });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Students");
+
+    worksheet.columns = [
+      { header: "ID", key: "id", width: 10 },
+      { header: "Name", key: "name", width: 30 },
+      { header: "Age", key: "age", width: 10 },
+      { header: "Grade", key: "grade", width: 10 },
+      { header: "Section", key: "section", width: 10 },
+      { header: "Gender", key: "gender", width: 10 },
+      { header: "Image", key: "image", width: 30 },
+    ];
+
+    students.forEach((s, index) => {
+      worksheet.addRow({
+        id: index + 1,
+        name: s.name,
+        age: s.age,
+        grade: s.grade,
+        section: s.section,
+        gender: s.gender,
+        image: s.image,
       });
-  
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Students");
-  
-      worksheet.columns = [
-        { header: "ID", key: "id", width: 10 }, // temporary serial
-        { header: "Name", key: "name", width: 30 },
-        { header: "Age", key: "age", width: 10 },
-        { header: "Grade", key: "grade", width: 10 },
-        { header: "Section", key: "section", width: 10 },
-        { header: "Gender", key: "gender", width: 10 },
-        { header: "Image", key: "image", width: 30 },
-      ];
-  
-      // Add rows with temporary sequential IDs
-      students.forEach((s, index) => {
-        worksheet.addRow({
-          id: index + 1, // 1,2,3,...
-          name: s.name,
-          age: s.age,
-          grade: s.grade,
-          section: s.section,
-          gender: s.gender,
-          image: s.image,
-        });
-      });
-  
-      res.setHeader(
-        "Content-Type",
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-      );
-      res.setHeader("Content-Disposition", "attachment; filename=students.xlsx");
-  
-      await workbook.xlsx.write(res);
-      res.end();
-    } catch (err) {
-      res.status(500).json({ err: err.message });
-    }
-  };
-  
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader("Content-Disposition", "attachment; filename=students.xlsx");
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+};
 
 // ✅ Import students from Excel
 export const importStudents = async (req, res) => {
-    try {
-      if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
-  
-      const workbook = xlsx.readFile(req.file.path);
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = xlsx.utils.sheet_to_json(sheet);
-  
-      let inserted = 0,
-        skipped = 0,
-        errors = [];
-  
-      for (let row of rows) {
-        // Normalize & trim
-        const name = (row.Name || row.name || "").toString().trim();
-        const age = Number(row.Age || row.age);
-        const grade = (row.Grade || row.grade).toString().trim();
-        const section = (row.Section || row.section || "").toString().trim().toUpperCase(); // normalize section to uppercase
-        const gender = (row.Gender || row.gender || "").toString().trim();
-  
-        if (!name || !age || !grade || !section || !gender) {
-          errors.push({ row, reason: "Missing required fields" });
-          skipped++;
-          continue;
-        }
-  
-        // Check duplicates case-insensitively
-        const existing = await Student.findOne({
-          where: Sequelize.where(
-            Sequelize.fn("LOWER", Sequelize.col("name")),
-            name.toLowerCase()
-          ),
-          // include grade and section case-insensitively too
-        });
-  
-        // Better: duplicate check on name + grade + section
-        const duplicate = await Student.findOne({
-          where: {
-            [Op.and]: [
-              Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("name")), name.toLowerCase()),
-              Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("grade")), grade.toLowerCase()),
-              Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("section")), section.toLowerCase()),
-            ],
-          },
-        });
-  
-        if (duplicate) {
-          skipped++;
-          errors.push({ row, reason: "Duplicate entry" });
-          continue;
-        }
-  
-        await Student.create({ name, age, grade, section, gender });
-        inserted++;
-      }
-  
-      res.json({ msg: "Import finished", inserted, skipped, errors });
-    } catch (err) {
-      console.error("Import error:", err);
-      res.status(500).json({ msg: "Import failed", error: err.message });
-    }
-  };
-  
-  
+  try {
+    if (!req.file) return res.status(400).json({ msg: "No file uploaded" });
 
-// ✅ Get all grades and sections (for dropdowns)
+    const workbook = xlsx.readFile(req.file.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = xlsx.utils.sheet_to_json(sheet);
+
+    let inserted = 0,
+      skipped = 0,
+      errors = [];
+
+    for (let row of rows) {
+      const name = (row.Name || row.name || "").toString().trim();
+      const age = Number(row.Age || row.age);
+      const grade = (row.Grade || row.grade).toString().trim();
+      const section = (row.Section || row.section || "").toString().trim().toUpperCase();
+      const gender = (row.Gender || row.gender || "").toString().trim();
+
+      if (!name || !age || !grade || !section || !gender) {
+        errors.push({ row, reason: "Missing required fields" });
+        skipped++;
+        continue;
+      }
+
+      const duplicate = await Student.findOne({
+        where: {
+          [Op.and]: [
+            Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("name")), name.toLowerCase()),
+            Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("grade")), grade.toLowerCase()),
+            Sequelize.where(Sequelize.fn("LOWER", Sequelize.col("section")), section.toLowerCase()),
+          ],
+        },
+      });
+
+      if (duplicate) {
+        skipped++;
+        errors.push({ row, reason: "Duplicate entry" });
+        continue;
+      }
+
+      await Student.create({ name, age, grade, section, gender });
+      inserted++;
+    }
+
+    res.json({ msg: "Import finished", inserted, skipped, errors });
+  } catch (err) {
+    console.error("Import error:", err);
+    res.status(500).json({ msg: "Import failed", error: err.message });
+  }
+};
+
+// ✅ Get grades + sections
 export const getAllGradesSections = async (req, res) => {
   try {
     const gradesRaw = await Student.findAll({
