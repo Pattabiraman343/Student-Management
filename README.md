@@ -7,13 +7,13 @@ A full-stack Student Management System built with React, Node.js, and PostgreSQL
 
 Admin credentials
 
-Username  :  Admin
+Username  :  Admin,
 Password  :  admin@123
 
 
 Teacher credentials
 
-Username  :  Geetha
+Username  :  Geetha,
 Password  :  geetha@123
 
 
